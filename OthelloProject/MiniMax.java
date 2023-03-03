@@ -1,11 +1,11 @@
 public class MiniMax {
 
     public Position minimaxSearch(GameState s) {
-        UtilityMove result = maxValue(s);
+        UtilityMove result = maxValue(s, Integer.MIN_VALUE, Integer.MAX_VALUE);
         return result.move;
     }
 
-    private UtilityMove maxValue(GameState s) {
+    private UtilityMove maxValue(GameState s, int alpha, int beta) {
         // Max wants to get as high utility for the player as possible
         if (isTerminal(s)) {
             return new UtilityMove(s, null);
@@ -14,18 +14,21 @@ public class MiniMax {
         Position bestMove = null;
         for (Position a : s.legalMoves()) {
             // find move that results in highest utility
-            // TODO: Prune (continue) if lower utility has been found
-            UtilityMove m = minValue(result(s, a));
+            UtilityMove m = minValue(result(s, a), alpha, beta);
             if (m.utility > bestUtility) {
                 bestUtility = m.utility; // override best utility
                 bestMove = a; // override best move
+                alpha = Math.max(alpha, bestUtility);
             }
+            if (bestUtility >= beta && bestMove != null)
+                return new UtilityMove(bestUtility, bestMove);
+
         }
         // return best utility and move
         return new UtilityMove(bestUtility, bestMove);
     }
 
-    private UtilityMove minValue(GameState s) {
+    private UtilityMove minValue(GameState s, int alpha, int beta) {
         // Min wants to get as low utility for the player (Max) as possible
         // Low score for Max means higher probability for Min to win
         if (isTerminal(s)) {
@@ -35,12 +38,14 @@ public class MiniMax {
         Position bestMove = null;
         for (Position a : s.legalMoves()) {
             // find move that results in lowest utility
-            // TODO: Prune (continue) if higher utility has been found
-            UtilityMove m = maxValue(result(s, a));
+            UtilityMove m = maxValue(result(s, a), alpha, beta);
             if (m.utility < bestUtility) {
                 bestUtility = m.utility; // override best utility
                 bestMove = a; // override best move
+                beta = Math.min(beta, bestUtility);
             }
+            if (bestUtility <= alpha && bestMove != null)
+                return new UtilityMove(bestUtility, bestMove);
         }
 
         // return best utility and move
