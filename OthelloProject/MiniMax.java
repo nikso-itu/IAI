@@ -1,12 +1,7 @@
 public class MiniMax {
-    private GameState s;
 
-    public MiniMax(GameState s) {
-        this.s = s;
-    }
-
-    public Position minimaxSearch() {
-        UtilityMove result = maxValue(this.s);
+    public Position minimaxSearch(GameState s) {
+        UtilityMove result = maxValue(s);
         return result.move;
     }
 
@@ -59,8 +54,10 @@ public class MiniMax {
 
     private GameState result(GameState s, Position a) {
         // return state that results from applying action `a` in state `s`
-        s.insertToken(a);
-        return s;
+        GameState newState = new GameState(s.getBoard(), s.getPlayerInTurn());
+        // make copy of game state, and simulate move in the new state
+        newState.insertToken(a);
+        return newState;
     }
 
     class UtilityMove {
