@@ -1,2 +1,2 @@
 javac ./*.java
-java -cp . Othello OthelloAI DumAI 8
+java -cp . Othello DumAI OthelloAI 4
