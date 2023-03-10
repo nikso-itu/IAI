@@ -1,18 +1,17 @@
 public class MiniMax {
-    
+
     private final int DEPTH_LIMIT = 10;
     private double[][] positionUtility;
     private int BOARD_SIZE;
-    
+
     private final double DANGER_UTILITY = 0;
     private final double CORNER_UTILITY = 2;
     private final double EDGE_UTILITY = 1;
     private final double DEFAULT_UTILITY = 0;
-    
+
     public Position minimaxSearch(GameState s) {
         computePositionUtility(s);
         UtilityMove result = maxValue(s, Integer.MIN_VALUE, Integer.MAX_VALUE, 0);
-        if(result.move == null) return s.legalMoves().get(0);
         return result.move;
     }
 
@@ -30,22 +29,22 @@ public class MiniMax {
         // Edges
         for (int i = 0; i < BOARD_SIZE; i++) {
             positionUtility[0][i] = EDGE_UTILITY;
-            positionUtility[BOARD_SIZE-1][i] = EDGE_UTILITY;
-            positionUtility[i][BOARD_SIZE-1] = EDGE_UTILITY;
+            positionUtility[BOARD_SIZE - 1][i] = EDGE_UTILITY;
+            positionUtility[i][BOARD_SIZE - 1] = EDGE_UTILITY;
             positionUtility[i][0] = EDGE_UTILITY;
         }
 
         // Corners (override corners after edges)
         positionUtility[0][0] = CORNER_UTILITY;
-        positionUtility[BOARD_SIZE-1][0] = CORNER_UTILITY;
-        positionUtility[0][BOARD_SIZE-1] = CORNER_UTILITY;
-        positionUtility[BOARD_SIZE-1][BOARD_SIZE-1] = CORNER_UTILITY;
+        positionUtility[BOARD_SIZE - 1][0] = CORNER_UTILITY;
+        positionUtility[0][BOARD_SIZE - 1] = CORNER_UTILITY;
+        positionUtility[BOARD_SIZE - 1][BOARD_SIZE - 1] = CORNER_UTILITY;
 
         // Danger zone
         for (int i = 1; i < BOARD_SIZE - 1; i++) {
             positionUtility[1][i] = DANGER_UTILITY;
-            positionUtility[BOARD_SIZE-2][i] = DANGER_UTILITY;
-            positionUtility[i][BOARD_SIZE-2] = DANGER_UTILITY;
+            positionUtility[BOARD_SIZE - 2][i] = DANGER_UTILITY;
+            positionUtility[i][BOARD_SIZE - 2] = DANGER_UTILITY;
             positionUtility[i][1] = DANGER_UTILITY;
         }
     }
@@ -137,7 +136,8 @@ public class MiniMax {
             double accUtility = 0.0;
             for (int i = 0; i < BOARD_SIZE; i++) {
                 for (int j = 0; j < BOARD_SIZE; j++) {
-                    // for each position, count up the utility if the token is placed by the current player
+                    // for each position, count up the utility if the token is placed by the current
+                    // player
                     if (state.getBoard()[i][j] == state.getPlayerInTurn()) {
                         // get utility from our utility array
                         accUtility += positionUtility[i][j];
