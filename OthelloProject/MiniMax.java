@@ -1,12 +1,12 @@
 public class MiniMax {
 
-    private final int DEPTH_LIMIT = 10;
+    private final int DEPTH_LIMIT = 9;
     private double[][] positionUtility;
     private int BOARD_SIZE;
 
     private final double DANGER_UTILITY = 0;
-    private final double CORNER_UTILITY = 2;
-    private final double EDGE_UTILITY = 1;
+    private final double CORNER_UTILITY = 4;
+    private final double EDGE_UTILITY = 2;
     private final double DEFAULT_UTILITY = 0;
 
     public Position minimaxSearch(GameState s) {
@@ -15,9 +15,27 @@ public class MiniMax {
         return result.move;
     }
 
+    private void compute8x8PositionUtility() {
+        positionUtility = new double[][] {
+                { 4, -3, 2, 2, 2, 2, -3, 4 },
+                { -3, -4, -1, -1, -1, -1, -4, -3 },
+                { 2, -1, 1, 0, 0, 1, -1, 2 },
+                { 2, -1, 0, 1, 1, 0, -1, 2 },
+                { 2, -1, 0, 1, 1, 0, -1, 2 },
+                { 2, -1, 1, 0, 0, 1, -1, 2 },
+                { -3, -4, -1, -1, -1, -1, -4, -3 },
+                { 4, -3, 2, 2, 2, 2, -3, 4 }
+        };
+    }
+
     private void computePositionUtility(GameState s) {
         BOARD_SIZE = s.getBoard().length;
+
         positionUtility = new double[BOARD_SIZE][BOARD_SIZE];
+        // if (BOARD_SIZE == 8) {
+        //     compute8x8PositionUtility();
+        //     return;
+        // }
 
         // Default
         for (int i = 0; i < BOARD_SIZE; i++) {
@@ -47,6 +65,26 @@ public class MiniMax {
             positionUtility[i][BOARD_SIZE - 2] = DANGER_UTILITY;
             positionUtility[i][1] = DANGER_UTILITY;
         }
+
+        // Fields around top left corner
+        positionUtility[0][1] = -CORNER_UTILITY;
+        positionUtility[1][0] = -CORNER_UTILITY;
+        positionUtility[1][1] = -CORNER_UTILITY;
+
+        // Fields around top right corner
+        positionUtility[0][BOARD_SIZE - 2] = -CORNER_UTILITY;
+        positionUtility[1][BOARD_SIZE - 2] = -CORNER_UTILITY;
+        positionUtility[1][BOARD_SIZE - 1] = -CORNER_UTILITY;
+
+        // Fields around bottom left corner
+        positionUtility[BOARD_SIZE - 2][0] = -CORNER_UTILITY;
+        positionUtility[BOARD_SIZE - 1][1] = -CORNER_UTILITY;
+        positionUtility[BOARD_SIZE - 2][1] = -CORNER_UTILITY;
+
+        // Fields around bottom right corner
+        positionUtility[BOARD_SIZE - 2][BOARD_SIZE - 1] = -CORNER_UTILITY;
+        positionUtility[BOARD_SIZE - 2][BOARD_SIZE - 2] = -CORNER_UTILITY;
+        positionUtility[BOARD_SIZE - 1][BOARD_SIZE - 2] = -CORNER_UTILITY;
     }
 
     private UtilityMove maxValue(GameState s, double alpha, double beta, int depth) {
