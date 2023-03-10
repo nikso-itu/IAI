@@ -5,7 +5,7 @@ public class MiniMax {
     private int BOARD_SIZE;
     
     private final double DANGER_UTILITY = 0;
-    private final double CORNER_UTILITY = 1000;
+    private final double CORNER_UTILITY = 2;
     private final double EDGE_UTILITY = 1;
     private final double DEFAULT_UTILITY = 0;
     
