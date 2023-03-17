@@ -1,7 +1,7 @@
 
 public class OthelloAI4dudes implements IOthelloAI {
 
-	private final int DEPTH_LIMIT = 10;
+	private final int DEPTH_LIMIT = 7;
 	private double[][] positionUtility;
 	private int BOARD_SIZE;
 
@@ -17,9 +17,9 @@ public class OthelloAI4dudes implements IOthelloAI {
 
 	public Position minimaxSearch(GameState s) {
 		computePositionUtility(s);
-		UtilityMove result = maxValue(s, Integer.MIN_VALUE, Integer.MAX_VALUE, 0);
 		if (s.legalMoves().size() == 1)
 			return s.legalMoves().get(0);
+		UtilityMove result = maxValue(s, Integer.MIN_VALUE, Integer.MAX_VALUE, 0);
 		return result.move;
 	}
 
@@ -219,5 +219,4 @@ public class OthelloAI4dudes implements IOthelloAI {
 			}
 		}
 	}
-
 }
