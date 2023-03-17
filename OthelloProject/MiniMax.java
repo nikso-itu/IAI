@@ -1,4 +1,7 @@
-public class MiniMax {
+import java.util.HashMap;
+import java.util.Map;
+
+public class Minimax {
 
     private final int DEPTH_LIMIT = 9;
     private double[][] positionUtility;
@@ -12,6 +15,8 @@ public class MiniMax {
     public Position minimaxSearch(GameState s) {
         computePositionUtility(s);
         UtilityMove result = maxValue(s, Integer.MIN_VALUE, Integer.MAX_VALUE, 0);
+        if (s.legalMoves().size() == 1)
+            return s.legalMoves().get(0);
         return result.move;
     }
 
@@ -32,10 +37,10 @@ public class MiniMax {
         BOARD_SIZE = s.getBoard().length;
 
         positionUtility = new double[BOARD_SIZE][BOARD_SIZE];
-        // if (BOARD_SIZE == 8) {
-        //     compute8x8PositionUtility();
-        //     return;
-        // }
+        if (BOARD_SIZE == 8) {
+            compute8x8PositionUtility();
+            return;
+        }
 
         // Default
         for (int i = 0; i < BOARD_SIZE; i++) {
@@ -93,11 +98,14 @@ public class MiniMax {
             // stop search as we have reached cut off
             return new UtilityMove(s, null);
         }
+
         double bestUtility = Integer.MIN_VALUE;
         Position bestMove = null;
         for (Position a : s.legalMoves()) {
             // find move that results in highest utility
-            UtilityMove m = minValue(result(s, a), alpha, beta, depth + 1);
+            GameState newState = result(s, a);
+            UtilityMove m = minValue(newState, alpha, beta, depth + 1);
+
             if (m.utility > bestUtility) {
                 bestUtility = m.utility; // override best utility
                 bestMove = a; // override best move
@@ -118,11 +126,15 @@ public class MiniMax {
             // stop search as we have reached cut off
             return new UtilityMove(s, null);
         }
+
         double bestUtility = Integer.MAX_VALUE;
         Position bestMove = null;
         for (Position a : s.legalMoves()) {
             // find move that results in lowest utility
-            UtilityMove m = maxValue(result(s, a), alpha, beta, depth + 1);
+
+            GameState newState = result(s, a);
+            UtilityMove m = maxValue(newState, alpha, beta, depth + 1);
+
             if (m.utility < bestUtility) {
                 bestUtility = m.utility; // override best utility
                 bestMove = a; // override best move
@@ -182,7 +194,25 @@ public class MiniMax {
                     }
                 }
             }
-            return accUtility;
+            int[] tokenCount = state.countTokens();
+            if (tokenCount[0] == tokenCount[1]) {
+                // equal amount of pieces - good for both
+                return 0;
+            }
+            if (state.getPlayerInTurn() == 1) {
+                // if it's our turn (AI)
+                if (tokenCount[0] > tokenCount[1])
+                    // reward having fewer pieces
+                    return 10000;
+                else
+                    // we have most pieces - return calculated utility
+                    return accUtility;
+            } else {
+                if (tokenCount[0] > tokenCount[1])
+                    return accUtility;
+                else
+                    return 10000;
+            }
         }
     }
 }
