@@ -1,7 +1,7 @@
 
 public class OthelloAI4dudes implements IOthelloAI {
 
-	private final int DEPTH_LIMIT = 7;
+	private final int DEPTH_LIMIT = 10;
 	private double[][] positionUtility;
 	private int BOARD_SIZE;
 
