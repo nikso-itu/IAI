@@ -1,5 +1,5 @@
 
-public class OthelloAI implements IOthelloAI {
+public class OthelloAI4dudes implements IOthelloAI {
 
 	private final int DEPTH_LIMIT = 9;
 	private double[][] positionUtility;
