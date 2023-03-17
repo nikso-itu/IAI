@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
 
 public class OthelloAI implements IOthelloAI {
 
@@ -11,20 +9,10 @@ public class OthelloAI implements IOthelloAI {
 	private final double CORNER_UTILITY = 4;
 	private final double EDGE_UTILITY = 2;
 	private final double DEFAULT_UTILITY = 0;
-	private List<Long> measurements = new ArrayList();
 
 	public Position decideMove(GameState s) {
-		long start = System.currentTimeMillis();
 		Position result = minimaxSearch(s);
-		long finished = System.currentTimeMillis();
-		measurements.add(finished - start);
-		printMeasurements();
 		return result;
-	}
-
-	public void printMeasurements() {
-		System.out.println(measurements);
-		System.out.println("Average: " + measurements.stream().mapToLong(i -> i).average());
 	}
 
 	public Position minimaxSearch(GameState s) {
