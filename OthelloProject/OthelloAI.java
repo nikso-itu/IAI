@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.LongStream;
 
 public class OthelloAI implements IOthelloAI {
 
