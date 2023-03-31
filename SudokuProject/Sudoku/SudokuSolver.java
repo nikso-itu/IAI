@@ -19,10 +19,10 @@ public class SudokuSolver implements ISudokuSolver {
 		size = size1;
 		puzzle = new int[size * size][size * size];
 		D = new ArrayList<ArrayList<Integer>>(size * size * size * size);
-		
+
 		// Initialize each D[X]
 		for (int i = 0; i < size * size * size * size; i++) {
-			ArrayList<Integer> d = new ArrayList<>(Arrays.asList(0,1,2,3,4,5,6,7,8,9));
+			ArrayList<Integer> d = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
 			D.set(i, d);
 		}
 	}
@@ -32,7 +32,14 @@ public class SudokuSolver implements ISudokuSolver {
 
 		// INITIAL_FC
 		INITIAL_FC(asn);
+
 		// FC
+		ArrayList<Integer> newAsn = FC(asn); // get solution
+		if (newAsn == null)
+			return false;
+
+		// Update puzzle with solution
+		puzzle = GetPuzzle(newAsn);
 
 		return true;
 	}
@@ -44,8 +51,54 @@ public class SudokuSolver implements ISudokuSolver {
 	// ---------------------------------------------------------------------------------
 	// YOUR TASK: Implement FC(asn)
 	// ---------------------------------------------------------------------------------
-	public ArrayList FC(ArrayList<Integer> asn) {
+	public ArrayList<Integer> FC(ArrayList<Integer> asn) {
+		return RecursiveFC(asn);
+	}
 
+	public ArrayList<Integer> RecursiveFC(ArrayList<Integer> asn) {
+		// check whether all variables have values different from 0
+		boolean isComplete = asn.stream().allMatch(i -> i != 0);
+
+		// if all value are non-zero, we have a complete assignment
+		if (isComplete)
+			return asn;
+
+		// find first unassigned variable
+		int unassigned = -1;
+		for (int i = 0; i < asn.size(); i++) {
+			if (asn.get(i) != 0) {
+				unassigned = i;
+				break;
+			}
+		}
+
+		// save old domain
+		ArrayList<ArrayList<Integer>> oldD = new ArrayList<ArrayList<Integer>>(D);
+
+		// try value from domain, and rollback otherwise
+		for (Integer domainValue : D.get(unassigned)) {
+			if (AC_FC(unassigned, domainValue)) {
+				// assign the unassigned variable
+				asn.set(unassigned, domainValue);
+
+				// recursively forward-chain the new assignment
+				ArrayList<Integer> R = FC(asn);
+
+				// if the new assignment doesn't fail, we keep the choice.
+				if (R != null) {
+					return R;
+				}
+
+				// the new assignment failed, therefore we unassign the variable again
+				asn.set(unassigned, 0);
+
+				// rollback
+				D = oldD;
+			} else {
+				// rollback
+				D = oldD;
+			}
+		}
 		return null;// failure
 	}
 
