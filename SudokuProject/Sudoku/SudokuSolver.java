@@ -20,14 +20,15 @@ public class SudokuSolver implements ISudokuSolver {
 		puzzle = new int[size * size][size * size];
 		D = new ArrayList<ArrayList<Integer>>(size * size * size * size);
 
-		// Initialize each D[X]
+		// Initialize each D[X] (domain value)
 		for (int i = 0; i < size * size * size * size; i++) {
-			ArrayList<Integer> d = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
-			D.set(i, d);
+			ArrayList<Integer> d = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
+			D.add(d);
 		}
 	}
 
 	public boolean solve() {
+		// update domains in order to ensure consistency with initial assignment
 		ArrayList<Integer> asn = GetAssignment(puzzle);
 
 		// INITIAL_FC
@@ -58,6 +59,7 @@ public class SudokuSolver implements ISudokuSolver {
 	public ArrayList<Integer> RecursiveFC(ArrayList<Integer> asn) {
 		// check whether all variables have values different from 0
 		boolean isComplete = asn.stream().allMatch(i -> i != 0);
+		System.out.println(asn.stream().filter(i -> i == 0).count());
 
 		// if all value are non-zero, we have a complete assignment
 		if (isComplete)
@@ -66,14 +68,14 @@ public class SudokuSolver implements ISudokuSolver {
 		// find first unassigned variable
 		int unassigned = -1;
 		for (int i = 0; i < asn.size(); i++) {
-			if (asn.get(i) != 0) {
+			if (asn.get(i) == 0) {
 				unassigned = i;
 				break;
 			}
 		}
 
 		// save old domain
-		ArrayList<ArrayList<Integer>> oldD = new ArrayList<ArrayList<Integer>>(D);
+		ArrayList<ArrayList<Integer>> oldD = deepCopy(D);
 
 		// try value from domain, and rollback otherwise
 		for (Integer domainValue : D.get(unassigned)) {
@@ -82,7 +84,7 @@ public class SudokuSolver implements ISudokuSolver {
 				asn.set(unassigned, domainValue);
 
 				// recursively forward-chain the new assignment
-				ArrayList<Integer> R = FC(asn);
+				ArrayList<Integer> R = RecursiveFC(asn);
 
 				// if the new assignment doesn't fail, we keep the choice.
 				if (R != null) {
@@ -100,6 +102,19 @@ public class SudokuSolver implements ISudokuSolver {
 			}
 		}
 		return null;// failure
+	}
+
+	// create copy of nested arrays
+	private ArrayList<ArrayList<Integer>> deepCopy(ArrayList<ArrayList<Integer>> toCopy) {
+		ArrayList<ArrayList<Integer>> copy = new ArrayList<ArrayList<Integer>>();
+		for (int i = 0; i < toCopy.size(); i++) {
+			ArrayList<Integer> entry = new ArrayList<>();
+			for (int j = 0; j < toCopy.get(i).size(); j++) {
+				entry.add(toCopy.get(i).get(j));
+			}
+			copy.add(entry);
+		}
+		return copy;
 	}
 
 	// ---------------------------------------------------------------------------------
@@ -170,7 +185,7 @@ public class SudokuSolver implements ISudokuSolver {
 	// REVISE
 	// ------------------------------------------------------------------
 	public boolean REVISE(int Xi, int Xj) {
-		Integer zero = new Integer(0);
+		Integer zero = 0;
 
 		assert (Xi >= 0 && Xj >= 0);
 		assert (Xi < size * size * size * size && Xj < size * size * size * size);
@@ -359,18 +374,18 @@ public class SudokuSolver implements ISudokuSolver {
 		ArrayList<Integer> asn = new ArrayList<Integer>();
 		for (int i = 0; i < size * size; i++) {
 			for (int j = 0; j < size * size; j++) {
-				asn.add(GetVariable(i, j), new Integer(p[i][j]));
+				asn.add(GetVariable(i, j), p[i][j]);
 				if (p[i][j] != 0) {
 					// restrict domain
 					D.get(GetVariable(i, j)).clear();
-					D.get(GetVariable(i, j)).add(new Integer(p[i][j]));
+					D.get(GetVariable(i, j)).add(p[i][j]);
 				}
 			}
 		}
 		return asn;
 	}
 
-	public int[][] GetPuzzle(ArrayList asn) {
+	public int[][] GetPuzzle(ArrayList<Integer> asn) {
 		int[][] p = new int[size * size][size * size];
 		for (int i = 0; i < size * size; i++) {
 			for (int j = 0; j < size * size; j++) {
